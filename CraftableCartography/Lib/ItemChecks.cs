@@ -9,6 +9,7 @@ namespace CraftableCartography.Lib
         public const string jpsCode = "jps";
         public const string temporalCompassCode = "compasstemporal";
         public const string temporalSextantCode = "sextanttemporal";
+        public const string sextantCode = "sextant";
         public const string mapCode = "map";
         public const string modDomain = "craftablecartography";
 
@@ -21,6 +22,7 @@ namespace CraftableCartography.Lib
                             return true;
             return false;
         }
+        
         public static bool GenericItemsCheck(IPlayer player, string[] itemCodes, string domain)
         {
             foreach (ItemSlot slot in player.InventoryManager.GetHotbarInventory())
@@ -33,11 +35,27 @@ namespace CraftableCartography.Lib
 
             return false;
         }
+        
         public static bool HasTemporalSextant(IPlayer player)
         {
             if (player.Entity.Api.Side == EnumAppSide.Client)
                 if (((ICoreClientAPI)player.Entity.Api).World.Player == player)
                     return GenericItemCheck(player, temporalSextantCode, modDomain);
+            return false;
+        }
+        
+        public static bool HasSextant(IPlayer player)
+        {
+            if (player.Entity.Api.Side == EnumAppSide.Client)
+            {
+                if (((ICoreClientAPI)player.Entity.Api).World.Player == player)
+                {
+                    return GenericItemCheck(player, sextantCode, modDomain);
+                }
+            } else if (player.Entity.Api.Side == EnumAppSide.Server)
+            {
+                return GenericItemCheck(player, sextantCode, modDomain);
+            }
             return false;
         }
 
@@ -52,10 +70,18 @@ namespace CraftableCartography.Lib
         public static bool HasMap(IPlayer player)
         {
             if (player.Entity.Api.Side == EnumAppSide.Client)
+            {
                 if (((ICoreClientAPI)player.Entity.Api).World.Player == player)
+                {
                     return GenericItemCheck(player, mapCode, modDomain);
+                }
+            } else if (player.Entity.Api.Side == EnumAppSide.Server)
+            {
+                return GenericItemCheck(player, mapCode, modDomain);
+            }
             return false;
         }
+        
         public static bool HasJPS(IPlayer player)
         {
             if (player.Entity.Api.Side == EnumAppSide.Client)

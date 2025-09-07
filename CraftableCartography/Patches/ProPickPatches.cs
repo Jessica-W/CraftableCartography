@@ -20,7 +20,10 @@ namespace CraftableCartography.Patches
         [HarmonyPatch(typeof(ItemProspectingPick), "PrintProbeResults")]
         public static bool PrintProbeResults(ItemProspectingPick __instance, IWorldAccessor world, IServerPlayer splr, ItemSlot itemslot, BlockPos pos)
         {
-            if (HasJPS(splr)) return true;
+            var hasJps = HasJPS(splr);
+            var hasMap = HasMap(splr);
+            var hasSextant = HasSextant(splr);
+            if (hasJps || (hasMap && hasSextant)) return true;
 
             Traverse traverse = Traverse.Create(__instance);
 
