@@ -227,7 +227,7 @@ namespace CraftableCartography.Items.Compass
                         labelTextures[k] = labelTexture;
 
                         float labelHeight = 0.2f;
-                        float labelXScale = labelTexture.Width / labelTexture.Height;
+                        float labelXScale = (float)labelTexture.Width / labelTexture.Height;
 
                         Vec3f lp1 = new(-labelHeight * labelXScale * 0.5f, 0, 2f + labelHeight);
                         Vec3f lp2 = new(labelHeight * labelXScale * 0.5f, 0, 2f);
