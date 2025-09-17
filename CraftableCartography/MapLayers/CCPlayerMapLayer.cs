@@ -8,6 +8,7 @@ using static CraftableCartography.Lib.CCConstants;
 using static CraftableCartography.Lib.ItemChecks;
 using System;
 using System.Threading.Tasks;
+using CraftableCartography.MapComponents;
 
 namespace CraftableCartography.MapLayers
 {
@@ -17,6 +18,7 @@ namespace CraftableCartography.MapLayers
         Dictionary<IPlayer, EntityMapComponent> MapComps = new();
         ICoreClientAPI capi;
         LoadedTexture ownTexture;
+        LoadedTexture ownNoCompassTexture;
         LoadedTexture otherTexture;
 
         public override string Title => "Players";
@@ -66,7 +68,7 @@ namespace CraftableCartography.MapLayers
         {
             if (!Active) return;
 
-            int size = (int)GuiElement.scaled(32);
+            int size = (int)GuiElement.scaled(64);
 
             if (ownTexture == null)
             {
@@ -75,8 +77,21 @@ namespace CraftableCartography.MapLayers
                 ctx.SetSourceRGBA(0, 0, 0, 0);
                 ctx.Paint();
                 capi.Gui.Icons.DrawMapPlayer(ctx, 0, 0, size, size, new double[] { 0, 0, 0, 1 }, new double[] { 1, 1, 1, 1 });
-
+                
                 ownTexture = new LoadedTexture(capi, capi.Gui.LoadCairoTexture(surface, false), size / 2, size / 2);
+                ctx.Dispose();
+                surface.Dispose();
+            }
+            
+            if (ownNoCompassTexture == null)
+            {
+                ImageSurface surface = new(Format.Argb32, size, size);
+                Context ctx = new(surface);
+                ctx.SetSourceRGBA(0, 0, 0, 0);
+                ctx.Paint();
+                capi.Gui.Icons.DrawWaypointCircle(ctx, 0, 0, size, size, new double[] { 1, 1, 1, 1 });
+
+                ownNoCompassTexture = new LoadedTexture(capi, capi.Gui.LoadCairoTexture(surface, false), size / 2, size / 2);
                 ctx.Dispose();
                 surface.Dispose();
             }
@@ -122,7 +137,8 @@ namespace CraftableCartography.MapLayers
                 MapComps.Remove(player);
             }
 
-            cmp = new EntityMapComponent(capi, player == capi.World.Player ? ownTexture : otherTexture, player.Entity);
+            var playerTexture = player == capi.World.Player && HasCompass(player) ? ownTexture : ownNoCompassTexture;
+            cmp = new CCMapComponent(capi, player == capi.World.Player ? playerTexture : otherTexture, player.Entity);
 
             MapComps[player] = cmp;
         }
@@ -140,7 +156,7 @@ namespace CraftableCartography.MapLayers
                 return false;
             }
 
-            if (!HasJPS(player)) return false;
+            if (!HasJPS(player) && !HasSextant(player)) return false;
 
             if (player != capi.World.Player &&
                 player.Entity.WatchedAttributes.GetString(JPSChannelAttr, "") !=

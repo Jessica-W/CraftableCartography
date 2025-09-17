@@ -10,6 +10,7 @@ namespace CraftableCartography.Lib
         public const string temporalCompassCode = "compasstemporal";
         public const string temporalSextantCode = "sextanttemporal";
         public const string sextantCode = "sextant";
+        public const string compassCode = "compass";
         public const string mapCode = "map";
         public const string modDomain = "craftablecartography";
 
@@ -78,6 +79,21 @@ namespace CraftableCartography.Lib
             } else if (player.Entity.Api.Side == EnumAppSide.Server)
             {
                 return GenericItemCheck(player, mapCode, modDomain);
+            }
+            return false;
+        }
+        
+        public static bool HasCompass(IPlayer player)
+        {
+            if (player.Entity.Api.Side == EnumAppSide.Client)
+            {
+                if (((ICoreClientAPI)player.Entity.Api).World.Player == player)
+                {
+                    return GenericItemCheck(player, compassCode, modDomain);
+                }
+            } else if (player.Entity.Api.Side == EnumAppSide.Server)
+            {
+                return GenericItemCheck(player, compassCode, modDomain);
             }
             return false;
         }
