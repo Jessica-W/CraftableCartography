@@ -90,7 +90,7 @@ namespace CraftableCartography.Items.Compass
 
             PrepareMesh();
 
-            compassZoom = 0.7f;
+            compassZoom = 1.1f;
         }
 
         void PrepareMesh()
@@ -210,15 +210,24 @@ namespace CraftableCartography.Items.Compass
                         float i_hdg = i + 180;
                         while (i_hdg >= 360) i_hdg -= 360;
 
-                        string str = i_hdg == 0 ? "-N-" : i_hdg.ToString();
+                        var str = ((int)i_hdg) switch
+                        {
+                            0 => "-N-",
+                            90 => "-E-",
+                            180 => "-S-",
+                            270 => "-W-",
+                            _ => i_hdg.ToString()
+                        };
                         CairoFont font = CairoFont.WhiteDetailText()
                             .WithColor(new double[] { 1, 1, 1, 1 })
                             .WithFontSize(32)
                             .WithStroke(new double[] { 0, 0, 0, 1 }, 2);
-                        if (i_hdg == 0)
+                        if (i_hdg % 90 == 0)
                         {
                             font.FontWeight = Cairo.FontWeight.Bold;
-                            font.Color = new double[] { 1, 0, 0, 1 };
+                            font.Color = i_hdg == 0
+                                ? new double[] { 1, 0, 0, 1 }
+                                : new double[] { 0.547d, 0.653d, 1, 1 };
                             font.StrokeWidth = 0;
                         }
 
